@@ -1,4 +1,4 @@
-import { Play, Trash2, Globe, CheckCircle, XCircle, Loader, Clock, Info } from 'lucide-react';
+import { Play, Trash2, Globe, CheckCircle, XCircle, Loader, Clock } from 'lucide-react';
 import { useState } from 'react';
 import type { Database } from '../lib/database.types';
 
@@ -8,11 +8,10 @@ interface SourceCardProps {
   source: Source;
   onRun: (sourceId: string) => void;
   onDelete: (sourceId: string) => void;
-  onViewLogs: (sourceId: string) => void;
   isRunning?: boolean;
 }
 
-export function SourceCard({ source, onRun, onDelete, onViewLogs, isRunning }: SourceCardProps) {
+export function SourceCard({ source, onRun, onDelete, isRunning }: SourceCardProps) {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
   const getStatusIcon = () => {
@@ -76,13 +75,6 @@ export function SourceCard({ source, onRun, onDelete, onViewLogs, isRunning }: S
         </div>
 
         <div className="flex gap-2">
-          <button
-            onClick={() => onViewLogs(source.id)}
-            className="p-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-            title="View scrape logs"
-          >
-            <Info className="w-4 h-4" />
-          </button>
           <button
             onClick={() => onRun(source.id)}
             disabled={isRunning}
