@@ -4,7 +4,6 @@ import { FilterBar } from './components/FilterBar';
 import { JobsTable } from './components/JobsTable';
 import { SourcesTray } from './components/SourcesTray';
 import { AddSourceModal } from './components/AddSourceModal';
-import { ScrapeLogsModal } from './components/ScrapeLogsModal';
 import { supabase } from './lib/supabase';
 import { api } from './lib/api';
 import { exportToCSV } from './utils/export';
@@ -19,9 +18,6 @@ function App() {
   const [sources, setSources] = useState<Source[]>([]);
   const [isLoadingJobs, setIsLoadingJobs] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLogsModalOpen, setIsLogsModalOpen] = useState(false);
-  const [selectedSourceId, setSelectedSourceId] = useState<string>('');
-  const [selectedSourceName, setSelectedSourceName] = useState<string>('');
   const [runningSources, setRunningSources] = useState<Set<string>>(new Set());
 
   const [contractType, setContractType] = useState<'all' | 'hourly' | 'ote'>('all');
@@ -128,15 +124,6 @@ function App() {
     }
   };
 
-  const handleViewLogs = (sourceId: string) => {
-    const source = sources.find(s => s.id === sourceId);
-    if (source) {
-      setSelectedSourceId(sourceId);
-      setSelectedSourceName(source.name);
-      setIsLogsModalOpen(true);
-    }
-  };
-
   const filteredJobs = jobs.filter((job) => {
     if (contractType !== 'all' && job.contract_type !== contractType) {
       return false;
@@ -193,7 +180,6 @@ function App() {
             sources={sources}
             onRunSource={handleRunSource}
             onDeleteSource={handleDeleteSource}
-            onViewLogs={handleViewLogs}
             runningSources={runningSources}
           />
         </>
@@ -228,13 +214,6 @@ function App() {
           loadSources();
           loadJobs();
         }}
-      />
-
-      <ScrapeLogsModal
-        isOpen={isLogsModalOpen}
-        onClose={() => setIsLogsModalOpen(false)}
-        sourceId={selectedSourceId}
-        sourceName={selectedSourceName}
       />
     </div>
   );

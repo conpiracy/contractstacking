@@ -9,11 +9,10 @@ interface SourcesTrayProps {
   sources: Source[];
   onRunSource: (sourceId: string) => void;
   onDeleteSource: (sourceId: string) => void;
-  onViewLogs: (sourceId: string) => void;
   runningSources: Set<string>;
 }
 
-export function SourcesTray({ sources, onRunSource, onDeleteSource, onViewLogs, runningSources }: SourcesTrayProps) {
+export function SourcesTray({ sources, onRunSource, onDeleteSource, runningSources }: SourcesTrayProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   if (sources.length === 0) {
@@ -48,7 +47,6 @@ export function SourcesTray({ sources, onRunSource, onDeleteSource, onViewLogs, 
                 source={source}
                 onRun={onRunSource}
                 onDelete={onDeleteSource}
-                onViewLogs={onViewLogs}
                 isRunning={runningSources.has(source.id)}
               />
             ))}
