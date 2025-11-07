@@ -1,62 +1,194 @@
 // Dashboard App Logic
 
-// Configuration - update these with your Supabase credentials
-const SUPABASE_URL = localStorage.getItem('supabase_url') || '';
-const SUPABASE_ANON_KEY = localStorage.getItem('supabase_key') || '';
-
 // State
 let allJobs = [];
 let filteredJobs = [];
+let settings = {};
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    loadSettings();
     setupEventListeners();
+    updateStatusIndicators();
 
-    // Check if Supabase is configured
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-        showSetupPrompt();
-    } else {
+    // Load jobs if credentials are configured
+    if (settings.supabase_url && settings.supabase_key) {
         loadJobs();
         // Auto-refresh every 5 seconds
         setInterval(loadJobs, 5000);
+    } else {
+        // Show sample data for demo
+        loadSampleData();
     }
 });
 
-function showSetupPrompt() {
-    const container = document.getElementById('jobs-container');
-    container.innerHTML = `
-        <div class="empty-state">
-            <h2>⚙️ Setup Required</h2>
-            <p style="margin-bottom: 20px;">Enter your Supabase credentials to connect the dashboard:</p>
-            <div style="max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px;">
-                <input type="text" id="setup-url" placeholder="Supabase URL" style="width: 100%; margin-bottom: 10px;">
-                <input type="text" id="setup-key" placeholder="Supabase Anon Key" style="width: 100%; margin-bottom: 20px;">
-                <button class="btn btn-primary" onclick="saveSupabaseConfig()" style="width: 100%;">Save & Connect</button>
-            </div>
-            <p style="margin-top: 20px; color: rgba(255,255,255,0.7);">
-                Or use local SQLite mode by running: <code>python3 -m http.server 8080</code> in the project directory
-            </p>
-        </div>
-    `;
+
+// Settings Management
+function loadSettings() {
+    settings = {
+        apify_token: localStorage.getItem('apify_token') || '',
+        telegram_token: localStorage.getItem('telegram_token') || '',
+        telegram_chat_id: localStorage.getItem('telegram_chat_id') || '',
+        supabase_url: localStorage.getItem('supabase_url') || '',
+        supabase_key: localStorage.getItem('supabase_key') || '',
+        min_hourly: parseInt(localStorage.getItem('min_hourly') || '15'),
+        excluded_keywords: localStorage.getItem('excluded_keywords') || 'manager,director,senior,vp,vice president',
+        target_keywords: localStorage.getItem('target_keywords') || 'sdr,bdr,sales dev,appointment setter,lead gen'
+    };
 }
 
-function saveSupabaseConfig() {
-    const url = document.getElementById('setup-url').value;
-    const key = document.getElementById('setup-key').value;
+function saveSettings() {
+    settings.apify_token = document.getElementById('apify-token').value;
+    settings.telegram_token = document.getElementById('telegram-token').value;
+    settings.telegram_chat_id = document.getElementById('telegram-chat-id').value;
+    settings.supabase_url = document.getElementById('supabase-url').value;
+    settings.supabase_key = document.getElementById('supabase-key').value;
+    settings.min_hourly = parseInt(document.getElementById('min-hourly').value || '15');
+    settings.excluded_keywords = document.getElementById('excluded-keywords').value;
+    settings.target_keywords = document.getElementById('target-keywords').value;
 
-    if (url && key) {
-        localStorage.setItem('supabase_url', url);
-        localStorage.setItem('supabase_key', key);
-        location.reload();
-    } else {
-        alert('Please enter both URL and Key');
+    // Save to localStorage
+    Object.keys(settings).forEach(key => {
+        localStorage.setItem(key, settings[key]);
+    });
+
+    updateStatusIndicators();
+
+    // Show success message
+    const status = document.getElementById('save-status');
+    status.style.display = 'block';
+    setTimeout(() => {
+        status.style.display = 'none';
+        closeSettings();
+    }, 2000);
+}
+
+function openSettings() {
+    // Populate form with current settings
+    document.getElementById('apify-token').value = settings.apify_token;
+    document.getElementById('telegram-token').value = settings.telegram_token;
+    document.getElementById('telegram-chat-id').value = settings.telegram_chat_id;
+    document.getElementById('supabase-url').value = settings.supabase_url;
+    document.getElementById('supabase-key').value = settings.supabase_key;
+    document.getElementById('min-hourly').value = settings.min_hourly;
+    document.getElementById('excluded-keywords').value = settings.excluded_keywords;
+    document.getElementById('target-keywords').value = settings.target_keywords;
+
+    document.getElementById('settings-modal').classList.add('active');
+}
+
+function closeSettings() {
+    document.getElementById('settings-modal').classList.remove('active');
+}
+
+function updateStatusIndicators() {
+    // Apify status
+    const apifyStatus = document.getElementById('apify-status');
+    if (apifyStatus) {
+        apifyStatus.className = 'status-indicator ' + (settings.apify_token ? 'green' : 'red');
     }
+
+    // Telegram status
+    const telegramStatus = document.getElementById('telegram-status');
+    if (telegramStatus) {
+        telegramStatus.className = 'status-indicator ' +
+            (settings.telegram_token && settings.telegram_chat_id ? 'green' : 'red');
+    }
+
+    // Supabase status
+    const supabaseStatus = document.getElementById('supabase-status');
+    if (supabaseStatus) {
+        supabaseStatus.className = 'status-indicator ' +
+            (settings.supabase_url && settings.supabase_key ? 'green' : 'yellow');
+    }
+}
+
+async function testTelegram() {
+    if (!settings.telegram_token || !settings.telegram_chat_id) {
+        alert('Please enter both Telegram Bot Token and Chat ID first');
+        return;
+    }
+
+    const testMessage = '🎉 SDR Job Bot is connected! Your notifications are working.';
+    const url = `https://api.telegram.org/bot${settings.telegram_token}/sendMessage`;
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: settings.telegram_chat_id,
+                text: testMessage
+            })
+        });
+
+        if (response.ok) {
+            alert('✅ Test message sent successfully! Check your Telegram.');
+        } else {
+            const error = await response.json();
+            alert('❌ Failed to send message: ' + (error.description || 'Unknown error'));
+        }
+    } catch (error) {
+        alert('❌ Error: ' + error.message);
+    }
+}
+
+function exportToEnv() {
+    const envContent = `# SDR Job Bot Environment Variables
+# Generated from Dashboard Settings on ${new Date().toLocaleString()}
+
+# Apify API Token (for job scraping)
+APIFY_TOKEN=${settings.apify_token || 'your_apify_token_here'}
+
+# Telegram Bot Configuration
+TELEGRAM_TOKEN=${settings.telegram_token || 'your_telegram_bot_token_here'}
+TELEGRAM_CHAT_ID=${settings.telegram_chat_id || 'your_telegram_chat_id_here'}
+
+# Supabase Configuration (optional - for cloud database)
+SUPABASE_URL=${settings.supabase_url || 'https://your-project.supabase.co'}
+SUPABASE_SERVICE_KEY=${settings.supabase_key || 'your_supabase_service_role_key_here'}
+
+# Filter Settings
+MIN_HOURLY=${settings.min_hourly || 15}
+EXCLUDED_KEYWORDS=${settings.excluded_keywords || 'manager,director,senior,vp'}
+TARGET_KEYWORDS=${settings.target_keywords || 'sdr,bdr,sales dev,appointment setter'}
+`;
+
+    document.getElementById('env-content').value = envContent;
+    document.getElementById('env-export').style.display = 'block';
+}
+
+function copyEnvToClipboard() {
+    const content = document.getElementById('env-content');
+    content.select();
+    document.execCommand('copy');
+
+    // Show feedback
+    const btn = event.target;
+    const originalText = btn.textContent;
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => {
+        btn.textContent = originalText;
+    }, 2000);
 }
 
 function setupEventListeners() {
     document.getElementById('filter-status').addEventListener('change', applyFilters);
     document.getElementById('filter-site').addEventListener('change', applyFilters);
     document.getElementById('search-input').addEventListener('input', applyFilters);
+
+    // Settings form
+    document.getElementById('settings-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        saveSettings();
+    });
+
+    // Close modal on background click
+    document.getElementById('settings-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'settings-modal') {
+            closeSettings();
+        }
+    });
 }
 
 async function loadJobs() {
@@ -81,11 +213,16 @@ async function loadJobs() {
 }
 
 async function loadFromSupabase() {
+    if (!settings.supabase_url || !settings.supabase_key) {
+        loadSampleData();
+        return;
+    }
+
     try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/jobs?select=*&order=found_at.desc`, {
+        const response = await fetch(`${settings.supabase_url}/rest/v1/jobs?select=*&order=found_at.desc`, {
             headers: {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                'apikey': settings.supabase_key,
+                'Authorization': `Bearer ${settings.supabase_key}`
             }
         });
 
@@ -100,6 +237,7 @@ async function loadFromSupabase() {
         }
     } catch (error) {
         console.error('Supabase error:', error);
+        loadSampleData();
     }
 }
 

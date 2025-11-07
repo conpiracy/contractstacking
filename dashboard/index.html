@@ -306,6 +306,190 @@
             height: 30px;
             stroke: #667eea;
         }
+
+        .settings-btn {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .settings-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .settings-btn svg {
+            width: 25px;
+            height: 25px;
+            stroke: #667eea;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-header h2 {
+            color: #667eea;
+            font-size: 2rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: monospace;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group small {
+            display: block;
+            color: #999;
+            margin-top: 5px;
+            font-size: 0.85rem;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+        .form-section h3 {
+            color: #667eea;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn-full {
+            flex: 1;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-indicator.green {
+            background: #51cf66;
+        }
+
+        .status-indicator.red {
+            background: #ff6b6b;
+        }
+
+        .status-indicator.yellow {
+            background: #ffd43b;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .alert-warning {
+            background: #fff3bf;
+            border-left: 4px solid #ffd43b;
+            color: #856404;
+        }
+
+        .alert-info {
+            background: #d3f9d8;
+            border-left: 4px solid #51cf66;
+            color: #2f9e44;
+        }
     </style>
 </head>
 <body>
@@ -365,10 +549,124 @@
         </div>
     </div>
 
+    <div class="settings-btn" onclick="openSettings()" title="Settings">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
+    </div>
+
     <div class="refresh-btn" onclick="loadJobs()" title="Refresh">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
         </svg>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚙️ Settings</h2>
+                <button class="close-btn" onclick="closeSettings()">&times;</button>
+            </div>
+
+            <div class="alert alert-warning">
+                <strong>⚠️ Security Note:</strong> Credentials are stored in your browser's localStorage. Never share this device with untrusted users.
+            </div>
+
+            <form id="settings-form">
+                <!-- Apify Settings -->
+                <div class="form-section">
+                    <h3>
+                        <span class="status-indicator" id="apify-status"></span>
+                        Apify (Job Scraping)
+                    </h3>
+                    <div class="form-group">
+                        <label for="apify-token">API Token</label>
+                        <input type="password" id="apify-token" placeholder="apify_api_xxxxxxxxxxxxxxxx">
+                        <small>Get your token from <a href="https://console.apify.com/account/integrations" target="_blank">Apify Console</a></small>
+                    </div>
+                </div>
+
+                <!-- Telegram Settings -->
+                <div class="form-section">
+                    <h3>
+                        <span class="status-indicator" id="telegram-status"></span>
+                        Telegram (Notifications)
+                    </h3>
+                    <div class="form-group">
+                        <label for="telegram-token">Bot Token</label>
+                        <input type="password" id="telegram-token" placeholder="1234567890:ABCdefGHIjklMNOpqrsTUVwxyz">
+                        <small>Get from <a href="https://t.me/botfather" target="_blank">@BotFather</a> on Telegram</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="telegram-chat-id">Chat ID</label>
+                        <input type="text" id="telegram-chat-id" placeholder="987654321">
+                        <small>Get from <a href="https://t.me/userinfobot" target="_blank">@userinfobot</a> on Telegram</small>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-secondary" onclick="testTelegram()">Send Test Message</button>
+                    </div>
+                </div>
+
+                <!-- Supabase Settings -->
+                <div class="form-section">
+                    <h3>
+                        <span class="status-indicator" id="supabase-status"></span>
+                        Supabase (Cloud Database)
+                    </h3>
+                    <div class="form-group">
+                        <label for="supabase-url">Project URL</label>
+                        <input type="text" id="supabase-url" placeholder="https://xxxxx.supabase.co">
+                        <small>From <a href="https://supabase.com/dashboard" target="_blank">Supabase Dashboard</a> → Settings → API</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="supabase-key">Service Role Key</label>
+                        <input type="password" id="supabase-key" placeholder="eyJhbGci...">
+                        <small>Use the <strong>service_role</strong> key, not anon key</small>
+                    </div>
+                </div>
+
+                <!-- Filter Settings -->
+                <div class="form-section">
+                    <h3>🎯 Filter Settings</h3>
+                    <div class="form-group">
+                        <label for="min-hourly">Minimum Hourly Rate ($)</label>
+                        <input type="number" id="min-hourly" placeholder="15" min="0" step="5">
+                        <small>Jobs below this rate will be filtered out</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="excluded-keywords">Excluded Keywords (comma-separated)</label>
+                        <textarea id="excluded-keywords" rows="3" placeholder="manager, director, senior, vp"></textarea>
+                        <small>Jobs containing these words in the title will be filtered out</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="target-keywords">Target Keywords (comma-separated)</label>
+                        <textarea id="target-keywords" rows="3" placeholder="sdr, bdr, sales dev, appointment setter"></textarea>
+                        <small>Jobs must contain at least one of these keywords</small>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary btn-full" onclick="exportToEnv()">📋 Export .env File</button>
+                    <button type="button" class="btn btn-secondary btn-full" onclick="closeSettings()">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-full">Save Settings</button>
+                </div>
+            </form>
+
+            <div id="save-status" style="display: none; margin-top: 20px;" class="alert alert-info">
+                ✅ Settings saved successfully!
+            </div>
+
+            <div id="env-export" style="display: none; margin-top: 20px;">
+                <div class="alert alert-info">
+                    <strong>📋 Copy this to your .env file:</strong>
+                    <textarea id="env-content" readonly style="width: 100%; min-height: 150px; margin-top: 10px; font-family: monospace; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+                    <button type="button" class="btn btn-primary" onclick="copyEnvToClipboard()" style="margin-top: 10px; width: 100%;">Copy to Clipboard</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>
