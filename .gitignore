@@ -21,3 +21,18 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# SDR Job Bot
+jobbot.db
+jobbot.db-journal
+secrets/
+*.db
+*.db-journal

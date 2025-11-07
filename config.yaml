@@ -1,0 +1,51 @@
+# Scraper definitions
+scrapers:
+  upwork:
+    type: apify
+    actor: "jupri/upwork"
+    input:
+      query: ["sales development representative", "sdr", "bdr", "appointment setter", "lead generation"]
+      hourly: true
+      limit: 50
+      age: 2
+      payment_verified: false
+
+  linkedin:
+    type: apify
+    actor: "misceres/linkedin-jobs-search"
+    input:
+      search_terms: ["sales development representative", "sdr", "bdr"]
+      location: "United States"
+      remote: true
+      limit: 50
+
+# Filter configuration
+filters:
+  min_hourly: 15
+  min_ote: 60000
+  excluded_keywords: ["manager", "architect", "director", "vp", "vice president", "intern", "accountant", "marketer", "executive"]
+  target_patterns: ["\\bsdr\\b", "\\bbdr\\b", "sales\\s*dev", "business\\s*dev", "appointment\\s*setter", "lead\\s*gen"]
+  allowed_job_types: ["contract", "part-time", "freelance", "1099"]
+
+# Notification settings
+telegram:
+  delay_seconds: 1.0
+  max_retries: 3
+
+# Secrets (paths to files, set these in .env)
+secrets:
+  apify_token_path: "/secrets/apify_token.txt"
+  telegram_token_path: "/secrets/telegram_token.txt"
+  telegram_chat_id_path: "/secrets/telegram_chat_id.txt"
+  supabase_url_path: "/secrets/supabase_url.txt"
+  supabase_key_path: "/secrets/supabase_key.txt"
+
+# Sync settings
+sync:
+  enabled: true
+  batch_size: 100
+
+# Dashboard
+dashboard:
+  port: 8080
+  refresh_interval_ms: 5000
